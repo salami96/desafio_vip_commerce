@@ -4,7 +4,7 @@ Este repositório detalha e versiona a criação deu um sistema em NodeJs e MySQ
 
 ## Como rodar este projeto
 
-```terminal
+```bash
 git clone https://github.com/salami96/desafio_vip_commerce.git
 
 npm install
