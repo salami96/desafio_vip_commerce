@@ -4,7 +4,9 @@
   "description": "Desafio Backend para vaga de Full Stack na VipCommerce",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon src/index.ts",
+    "build": "sucrase ./src -d ./dist --transforms typescript,imports",
+    "serve": "node dist/index.js"
   },
   "author": "Gabriel Zanatto Salami <gabriel.zanatto2@gmail.com>",
   "license": "ISC",
@@ -26,6 +28,7 @@
   },
   "dependencies": {
     "@types/express": "^4.17.7",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5"
   }
 }
