@@ -1,6 +1,54 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, json } from 'express';
+const nodemailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
 import { Order } from '../model/entities';
 import { OrderRepository } from '../model/repo/order.repo';
+
+let transporter = nodemailer.createTransport(smtpTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    auth: {
+        user: 'gabriel.zanatto2@gmail.com',
+        pass: '****'
+    }
+}))
+
+function sendMail(to: string, html: string) {
+    let mailOptions = {
+        from: 'gabriel.zanatto2@gmail.com',
+        to,
+        subject: 'Pedido na loja online da VipCommerce!',
+        html
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+}
+
+function formatMsg(order: any) {
+    let msg = `
+        <h1>Pedido no site da VipCommerce: Código ${order[0].PEDIDO}</h1>
+        <p>Pagamento: ${order[0].PAGAMENTO}</p>
+        <p>Cliente: ${order[0].CLIENTE}</p>
+        <p>Data: ${new Date(order[0].DATA).toLocaleString()}</p>
+        <p>Observações: ${order[0].OBSERVAÇÔES}</p>
+        <h2>Produtos</h2>
+    `;
+    let total = 0;
+    order.forEach((o: any) => {
+        total += o.TOTAL;
+        msg += `
+            <p>${o.PRODUTO}, ${o.QUANTIDADE} un., total desse produto: R$ ${(o.TOTAL).toFixed(2).replace('.',',')}</p>
+        `;
+    });
+    msg += `<h2>Total Geral: R$ ${total.toFixed(2).replace('.',',')}</h2>`;
+    return msg;
+}
+
 
 export class OrderController {
     static async getOrders(req: Request, res: Response, next: NextFunction): Promise<Response> {
@@ -16,6 +64,34 @@ export class OrderController {
         }
     }
     static async getOrder(req: Request, res: Response, next: NextFunction): Promise<Response> {
+        try {
+            const { cod } = req.params;
+            const order = await OrderRepository.getOrder(cod);
+            if (order){
+                return res.json(order);
+            } else {
+                return res.json(null);
+            }
+        } catch (erro) {
+            next(erro);
+        }
+    }
+    static async Order2Email(req: Request, res: Response, next: NextFunction): Promise<Response> {
+        try {
+            const { cod } = req.params;
+            const order = await OrderRepository.getOrder(cod);
+            if (order){
+                let to = (order as any)[0].EMAIL
+                sendMail(to, formatMsg(order));
+                return res.json({ msg: 'Enviando e-mail' });
+            } else {
+                return res.json(null);
+            }
+        } catch (erro) {
+            next(erro);
+        }
+    }
+    static async Order2PDF(req: Request, res: Response, next: NextFunction): Promise<Response> {
         try {
             const { cod } = req.params;
             const order = await OrderRepository.getOrder(cod);
