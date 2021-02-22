@@ -21,7 +21,6 @@ export interface Order {
 }
 export interface OrderProducts {
     cod: number;
-    cod_order: number;
     cod_product: number;
     quantity: number;
 }
