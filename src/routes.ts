@@ -25,5 +25,7 @@ router.get('/pedidos/:cod', OrderController.getOrder);
 router.post('/pedidos', OrderController.saveOrder);
 router.put('/pedidos/:cod', OrderController.updateOrder);
 router.delete('/pedidos/:cod', OrderController.deleteOrder);
+router.post('/pedidos/:cod/sendmail', OrderController.Order2Email);
+router.post('/pedidos/:cod/report', OrderController.Order2PDF);
 
 export { router };
