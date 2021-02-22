@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction, json } from 'express';
 const nodemailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
+const pdf = require('html-pdf');
+import fs from 'fs';
 import { Order } from '../model/entities';
 import { OrderRepository } from '../model/repo/order.repo';
 
@@ -47,6 +49,10 @@ function formatMsg(order: any) {
     });
     msg += `<h2>Total Geral: R$ ${total.toFixed(2).replace('.',',')}</h2>`;
     return msg;
+}
+
+function pdfGenerator(html: string) {
+
 }
 
 
@@ -96,7 +102,15 @@ export class OrderController {
             const { cod } = req.params;
             const order = await OrderRepository.getOrder(cod);
             if (order){
-                return res.json(order);
+                const options = {
+                    type: 'pdf',
+                    format: 'A4',
+                    orientation: 'portrait'
+                }
+                pdf.create(formatMsg(order), options).toBuffer((err, buffer) => {
+                    if(err) return res.status(500).json(err)
+                    res.end(buffer);
+                })
             } else {
                 return res.json(null);
             }
