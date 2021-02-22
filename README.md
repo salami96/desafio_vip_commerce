@@ -11,3 +11,9 @@ npm install
 
 npm start
 ```
+
+## Para configurar o envio de email com gmail
+
+ 1. Informe seu email e senha no arquivo src/controllers/order.controller.ts
+ 2. Acesse <https://myaccount.google.com/lesssecureapps> e habilite para aplicativos menos seguros. Se isso não funcionar, então:
+ 3. Acesse <https://accounts.google.com/DisplayUnlockCaptcha> e ative o login sem captcha.
